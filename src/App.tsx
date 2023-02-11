@@ -1,69 +1,74 @@
 import "./App.css";
 import ProfileRepository from "./ProfileRepository";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-class App extends React.Component {
-  private profileRepository: ProfileRepository;
-  private inputRef = React.createRef<HTMLInputElement>();
 
-  constructor(props: any) {
-    super(props);
+function App() {
+  const profileRepository = new ProfileRepository();
+  const [savedPrompt, setSavedPrompt] = useState(Array<JSX.Element>());
+  const [savedNegativePrompt, setSavedNegativePrompts] = useState(Array<JSX.Element>());
+  const inputRef = React.createRef<HTMLInputElement>();
 
-    this.profileRepository = new ProfileRepository();
-  }
+  useEffect(() => {
+    Promise.all([
+      profileRepository.getSavedPrompts(),
+      profileRepository.getSavedNegativePrompts()
+    ]).then(([prompts, negativePrompts]) => {
+      setSavedPrompt(prompts.map((prompt) => {
+        // todo リストア処理
+        return <li key={prompt.id}>{prompt.profileName}</li>;
+      }));
+      setSavedNegativePrompts(negativePrompts.map((prompt) => {
+        // todo リストア処理
+        return <li key={prompt.id}>{prompt.profileName}</li>;
+      }));
+    });
+  });
 
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <h1>Prompt</h1>
-          <ul>
-            {this.profileRepository.getSavedPrompts().map((prompt) => {
-              // todo リストア処理
-              return <li key={prompt.id}>{prompt.profileName}</li>;
-            })}
-          </ul>
-          <h1>Negative Prompt</h1>
-          <ul>
-            {this.profileRepository.getSavedNegativePrompts().map((prompt) => {
-              // todo リストア処理
-              return <li key={prompt.id}>{prompt.profileName}</li>;
-            })}
-          </ul>
-          <form>
-            <label>Profile Name</label>
-            <input ref={this.inputRef} type="text" />
-            <div>
-              <button
-                type="button"
-                onClick={() => {
-                  const prompt = "";
-                  this.profileRepository.savePrompt(
-                    this.inputRef.current?.value ?? "noname"
-                  );
-                }}
-              >
-                Save Prompt
-              </button>
-            </div>
-            <div>
-              <button
-                type="button"
-                onClick={() => {
-                  const negativePrompt = "";
-                  this.profileRepository.savePrompt(
-                    this.inputRef.current?.value ?? "noname",
-                  );
-                }}
-              >
-                Save Negative Prompt
-              </button>
-            </div>
-          </form>
-        </header>
-      </div>
-    );
-  }
+  return (
+    <div className="App">
+      <header className="App-header">
+        <h1>Prompt</h1>
+        <ul>
+          {savedPrompt}
+        </ul>
+        <h1>Negative Prompt</h1>
+        <ul>
+          {savedNegativePrompt}
+        </ul>
+        <form>
+          <label>Profile Name</label>
+          <input ref={inputRef} type="text" />
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                profileRepository.savePrompt(
+                  inputRef.current?.value ?? "noname"
+                );
+              }}
+            >
+              Save Prompt
+            </button>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                profileRepository.saveNegativePrompt(
+                  inputRef.current?.value ?? "noname",
+                );
+              }}
+            >
+              Save Negative Prompt
+            </button>
+          </div>
+        </form>
+      </header>
+    </div>
+  );
+
 }
+
 
 export default App;
