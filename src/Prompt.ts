@@ -3,4 +3,5 @@ export type Prompt = {
   profileName: string;
   prompt: string;
   createdAt: Date;
+  isNegativePrompt: Boolean;
 };
