@@ -71,13 +71,34 @@ export default class ProfileRepository {
     ];
   }
 
-  savePrompt(profileName: string, promptText: string): void {
-    console.log("save prompt!");
+  async savePrompt(profileName: string): Promise<void> {
+    let queryOptions = { active: true, currentWindow: true };
+    let [tab] = await chrome.tabs.query(queryOptions);
+    let tabId = tab.id!
+
+    chrome.scripting.executeScript({
+      target: { tabId }, func: () => {
+        const element = document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_prompt > label > textarea");
+
+        if (element != null && element instanceof HTMLTextAreaElement) {
+          const textArea = element as HTMLTextAreaElement;
+
+          return textArea.value;
+        } else {
+          return null;
+        }
+      }
+    }).then(([value]) => {
+      if (value.result != null && value.result != "") {
+        // todo プロンプトを保存する
+      } else {
+      }
+    });
   }
 
-  saveNegativePrompt(profileName: string, promptText: string): void {}
+  saveNegativePrompt(profileName: string, promptText: string): void { }
 
-  applyPrompt(profileName: string, isAppend: boolean): void {}
+  applyPrompt(profileName: string, isAppend: boolean): void { }
 
-  applytNegativePrompt(profileName: string, isAppend: boolean): void {}
+  applytNegativePrompt(profileName: string, isAppend: boolean): void { }
 }

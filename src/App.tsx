@@ -35,12 +35,11 @@ class App extends React.Component {
             <input ref={this.inputRef} type="text" />
             <div>
               <button
-                onSubmit={() => {
-                  // todo promptを拾う
+                type="button"
+                onClick={() => {
                   const prompt = "";
                   this.profileRepository.savePrompt(
-                    this.inputRef.current?.value ?? "noname",
-                    prompt
+                    this.inputRef.current?.value ?? "noname"
                   );
                 }}
               >
@@ -49,12 +48,11 @@ class App extends React.Component {
             </div>
             <div>
               <button
-                onSubmit={() => {
-                  // todo promptを拾う
+                type="button"
+                onClick={() => {
                   const negativePrompt = "";
                   this.profileRepository.savePrompt(
                     this.inputRef.current?.value ?? "noname",
-                    negativePrompt
                   );
                 }}
               >
