@@ -15,12 +15,22 @@ function App() {
       profileRepository.getSavedNegativePrompts()
     ]).then(([prompts, negativePrompts]) => {
       setSavedPrompt(prompts.map((prompt) => {
-        // todo リストア処理
-        return <li key={prompt.id}>{prompt.profileName}</li>;
+        return (
+          <li key={prompt.id}>
+            <a href="#" onClick={() => {
+              profileRepository.applyPrompt(prompt.id, false, false);
+            }}>{prompt.profileName}</a>
+          </li>
+        );
       }));
       setSavedNegativePrompts(negativePrompts.map((prompt) => {
-        // todo リストア処理
-        return <li key={prompt.id}>{prompt.profileName}</li>;
+        return (
+          <li key={prompt.id}>
+            <a href="#" onClick={() => {
+              profileRepository.applyPrompt(prompt.id, true, false);
+            }}>{prompt.profileName}</a>
+          </li>
+        );
       }));
     });
   });

@@ -3,20 +3,30 @@ import { v4 as uuidv4 } from "uuid";
 
 
 export default class ProfileRepository {
-  async fetchSavedPrompts(): Promise<Array<Prompt>> {
-    const values = Object.entries(await chrome.storage.local.get(null))
+  async fetchSavedPrompts(key: string | null): Promise<Array<Prompt>> {
+    const values = Object.entries(await chrome.storage.local.get(key))
       .map(([key, value]) => { try { return value as Prompt } catch (e) { return null } });
 
     return values.filter((v): v is Prompt => v != null)
   }
 
   async getSavedPrompts(): Promise<Array<Prompt>> {
-    return (await this.fetchSavedPrompts()).filter(v => !v.isNegativePrompt);
+    return (await this.fetchSavedPrompts(null)).filter(v => !v.isNegativePrompt);
   }
 
   async getSavedNegativePrompts(): Promise<Array<Prompt>> {
 
-    return (await this.fetchSavedPrompts()).filter(v => v.isNegativePrompt);
+    return (await this.fetchSavedPrompts(null)).filter(v => v.isNegativePrompt);
+  }
+
+  async promptFromTextArea(element: Element) {
+    if (element != null && element instanceof HTMLTextAreaElement) {
+      const textArea = element as HTMLTextAreaElement;
+
+      return textArea.value;
+    } else {
+      return null;
+    }
   }
 
   async savePrompt(profileName: string): Promise<void> {
@@ -97,7 +107,36 @@ export default class ProfileRepository {
     });
   }
 
-  applyPrompt(id: string, isAppend: boolean): void { }
+  async applyPrompt(id: string, isNegative: boolean, isAppend: boolean): Promise<void> {
+    const [value] = await this.fetchSavedPrompts(id);
 
-  applytNegativePrompt(profileName: string, isAppend: boolean): void { }
+    let queryOptions = { active: true, currentWindow: true };
+    let [tab] = await chrome.tabs.query(queryOptions);
+    let tabId = tab.id!
+
+    await chrome.scripting.executeScript({
+      target: { tabId },
+      args: [value.prompt, isNegative],
+      func: (prompt: string, isNegative: boolean) => {
+
+        const element = (() => {
+          if (isNegative) {
+            return document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_neg_prompt > label > textarea");
+          } else {
+            return document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_prompt > label > textarea");
+          }
+        })();
+
+        if (element != null && element instanceof HTMLTextAreaElement) {
+          const textArea = element as HTMLTextAreaElement;
+
+          textArea.value = prompt;
+
+          console.log(`restored ${prompt}`);
+        } else {
+          return null;
+        }
+      }
+    });
+  }
 }
