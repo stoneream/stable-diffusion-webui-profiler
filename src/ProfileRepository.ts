@@ -75,7 +75,7 @@ export default class ProfileRepository {
 
     chrome.scripting.executeScript({
       target: { tabId }, func: () => {
-        const element = document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_prompt > label > textarea");
+        const element = document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_neg_prompt > label > textarea");
 
         if (element != null && element instanceof HTMLTextAreaElement) {
           const textArea = element as HTMLTextAreaElement;
@@ -138,5 +138,9 @@ export default class ProfileRepository {
         }
       }
     });
+  }
+
+  async removePrompt(id: string): Promise<void> {
+    await chrome.storage.local.remove(id);
   }
 }

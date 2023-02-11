@@ -17,18 +17,20 @@ function App() {
       setSavedPrompt(prompts.map((prompt) => {
         return (
           <li key={prompt.id}>
-            <a href="#" onClick={() => {
+            <a className="App-li-text" href="#" onClick={() => {
               profileRepository.applyPrompt(prompt.id, false, false);
             }}>{prompt.profileName}</a>
+            <a className="App-li-delete" href="#" onClick={() => { profileRepository.removePrompt(prompt.id); }}>[x]</a>
           </li>
         );
       }));
       setSavedNegativePrompts(negativePrompts.map((prompt) => {
         return (
           <li key={prompt.id}>
-            <a href="#" onClick={() => {
+            <a className="App-li-text" href="#" onClick={() => {
               profileRepository.applyPrompt(prompt.id, true, false);
             }}>{prompt.profileName}</a>
+            <a className="App-li-delete" href="#" onClick={() => { profileRepository.removePrompt(prompt.id); }}>[x]</a>
           </li>
         );
       }));
@@ -38,11 +40,11 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Prompt</h1>
+        <h2>Prompt</h2>
         <ul>
           {savedPrompt}
         </ul>
-        <h1>Negative Prompt</h1>
+        <h2>Negative Prompt</h2>
         <ul>
           {savedNegativePrompt}
         </ul>
