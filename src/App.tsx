@@ -2,38 +2,71 @@ import "./App.css";
 import ProfileRepository from "./ProfileRepository";
 import React, { useEffect, useState } from "react";
 
-
 function App() {
   const profileRepository = new ProfileRepository();
   const [savedPrompt, setSavedPrompt] = useState(Array<JSX.Element>());
-  const [savedNegativePrompt, setSavedNegativePrompts] = useState(Array<JSX.Element>());
+  const [savedNegativePrompt, setSavedNegativePrompts] = useState(
+    Array<JSX.Element>()
+  );
   const inputRef = React.createRef<HTMLInputElement>();
 
   useEffect(() => {
     Promise.all([
       profileRepository.getSavedPrompts(),
-      profileRepository.getSavedNegativePrompts()
+      profileRepository.getSavedNegativePrompts(),
     ]).then(([prompts, negativePrompts]) => {
-      setSavedPrompt(prompts.map((prompt) => {
-        return (
-          <li key={prompt.id}>
-            <a className="App-li-text" href="#" onClick={() => {
-              profileRepository.applyPrompt(prompt.id, false, false);
-            }}>{prompt.profileName}</a>
-            <a className="App-li-delete" href="#" onClick={() => { profileRepository.removePrompt(prompt.id); }}>[x]</a>
-          </li>
-        );
-      }));
-      setSavedNegativePrompts(negativePrompts.map((prompt) => {
-        return (
-          <li key={prompt.id}>
-            <a className="App-li-text" href="#" onClick={() => {
-              profileRepository.applyPrompt(prompt.id, true, false);
-            }}>{prompt.profileName}</a>
-            <a className="App-li-delete" href="#" onClick={() => { profileRepository.removePrompt(prompt.id); }}>[x]</a>
-          </li>
-        );
-      }));
+      setSavedPrompt(
+        prompts.map((prompt) => {
+          return (
+            <li key={prompt.id}>
+              <a
+                className="App-li-text"
+                href="#"
+                onClick={() => {
+                  profileRepository.applyPrompt(prompt.id, false, false);
+                }}
+              >
+                {prompt.profileName}
+              </a>
+              <a
+                className="App-li-delete"
+                href="#"
+                onClick={() => {
+                  profileRepository.removePrompt(prompt.id);
+                }}
+              >
+                [x]
+              </a>
+            </li>
+          );
+        })
+      );
+      setSavedNegativePrompts(
+        negativePrompts.map((prompt) => {
+          return (
+            <li key={prompt.id}>
+              <a
+                className="App-li-text"
+                href="#"
+                onClick={() => {
+                  profileRepository.applyPrompt(prompt.id, true, false);
+                }}
+              >
+                {prompt.profileName}
+              </a>
+              <a
+                className="App-li-delete"
+                href="#"
+                onClick={() => {
+                  profileRepository.removePrompt(prompt.id);
+                }}
+              >
+                [x]
+              </a>
+            </li>
+          );
+        })
+      );
     });
   });
 
@@ -41,13 +74,9 @@ function App() {
     <div className="App">
       <header className="App-header">
         <h2>Prompt</h2>
-        <ul>
-          {savedPrompt}
-        </ul>
+        <ul>{savedPrompt}</ul>
         <h2>Negative Prompt</h2>
-        <ul>
-          {savedNegativePrompt}
-        </ul>
+        <ul>{savedNegativePrompt}</ul>
         <form>
           <label>Profile Name</label>
           <input ref={inputRef} type="text" />
@@ -81,8 +110,6 @@ function App() {
       </header>
     </div>
   );
-
 }
-
 
 export default App;
