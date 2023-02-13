@@ -19,24 +19,21 @@ export default class ProfileRepository {
     return (await this.fetchSavedPrompts(null)).filter(v => v.isNegativePrompt);
   }
 
-  async promptFromTextArea(element: Element) {
-    if (element != null && element instanceof HTMLTextAreaElement) {
-      const textArea = element as HTMLTextAreaElement;
-
-      return textArea.value;
-    } else {
-      return null;
-    }
-  }
-
-  async savePrompt(profileName: string): Promise<void> {
+  async savePrompt(profileName: string, isNegative: boolean): Promise<void> {
     let queryOptions = { active: true, currentWindow: true };
     let [tab] = await chrome.tabs.query(queryOptions);
     let tabId = tab.id!
 
     chrome.scripting.executeScript({
       target: { tabId }, func: () => {
-        const element = document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_prompt > label > textarea");
+        const element = (() => {
+
+          if (isNegative) {
+            return document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_neg_prompt > label > textarea");
+          } else {
+            return document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_prompt > label > textarea");
+          }
+        })();
 
         if (element != null && element instanceof HTMLTextAreaElement) {
           const textArea = element as HTMLTextAreaElement;
@@ -54,46 +51,7 @@ export default class ProfileRepository {
           profileName: profileName,
           prompt: value.result,
           createdAt: new Date(),
-          isNegativePrompt: false
-        }
-
-        chrome.storage.local.set({ [id]: prompt }).then(() => {
-          console.log("saved!");
-        }).catch((reason) => {
-          console.error(reason);
-        });
-      } else {
-        // do nothing
-      }
-    });
-  }
-
-  async saveNegativePrompt(profileName: string): Promise<void> {
-    let queryOptions = { active: true, currentWindow: true };
-    let [tab] = await chrome.tabs.query(queryOptions);
-    let tabId = tab.id!
-
-    chrome.scripting.executeScript({
-      target: { tabId }, func: () => {
-        const element = document.querySelector("body > gradio-app")?.shadowRoot?.querySelector("#txt2img_neg_prompt > label > textarea");
-
-        if (element != null && element instanceof HTMLTextAreaElement) {
-          const textArea = element as HTMLTextAreaElement;
-
-          return textArea.value;
-        } else {
-          return null;
-        }
-      }
-    }).then(([value]) => {
-      if (value.result != null && value.result != "") {
-        const id = uuidv4();
-        const prompt: Prompt = {
-          id: id,
-          profileName: profileName,
-          prompt: value.result,
-          createdAt: new Date(),
-          isNegativePrompt: true
+          isNegativePrompt: isNegative
         }
 
         chrome.storage.local.set({ [id]: prompt }).then(() => {

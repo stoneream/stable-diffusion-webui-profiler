@@ -56,7 +56,8 @@ function App() {
               type="button"
               onClick={() => {
                 profileRepository.savePrompt(
-                  inputRef.current?.value ?? "noname"
+                  inputRef.current?.value ?? "noname",
+                  false
                 );
               }}
             >
@@ -67,8 +68,9 @@ function App() {
             <button
               type="button"
               onClick={() => {
-                profileRepository.saveNegativePrompt(
+                profileRepository.savePrompt(
                   inputRef.current?.value ?? "noname",
+                  true
                 );
               }}
             >
