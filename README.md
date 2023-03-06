@@ -1,5 +1,9 @@
 # stable-diffusion-webui-profiler
 
+# about
+
+[Stable Diffusionで遊んでる話とChrome拡張を作ってみる話.md](https://gist.github.com/stoneream/0f0895142dc6e47390b217ed5f98c8bf)
+
 # dev
 
 ```bash
